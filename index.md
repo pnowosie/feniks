@@ -169,21 +169,6 @@ or API development at imapp(R)
   - `{:error, reason}` - when fails
   - `[list]` - queries with multiple items or empty list
 
-
-## Controllers layer
-- Validates all parameters in `with` expression, use `OMG.RPC.Web.Validator.Base` module
-- Pass validated params to `application API` function with the same name as Controller action
-- Pass the result to the `api_response` function, (see: `OMG.Watcher.Web` module, which inject this fn to all ctlrs). It does:
-  - Unsuccessful result is passed through (and will be handled by `fallback_controller`, it’s std Phx behavior)
-  - Sanitizes the result: converts structs to maps, encoded binary to hex, and so (see: `OMG.Watcher.Web.Serializer.Response`)
-  - Discovers `View` module from `Ctlr` and passes result with `%{response: result}` where `result` is unwrapped from `{:ok, _}` tuple
-
-
-## Views layer
-- In most cases just passes the response to `OMG.RPC.Web.Serializer.Response.serialize` function which forms std API response 
-- It’s the place to restructure response if needed, e.g. add/remove some fields
-- It’s assumed that `Views` renders only successful responses
-
 ```elixir
 defmodule OMG.Watcher.API.Transaction do
 
@@ -194,7 +179,17 @@ defmodule OMG.Watcher.API.Transaction do
             else: {:error, :transaction_not_found}
     end
 end
+```
 
+## Controllers layer
+- Validates all parameters in `with` expression, use `OMG.RPC.Web.Validator.Base` module
+- Pass validated params to `application API` function with the same name as Controller action
+- Pass the result to the `api_response` function, (see: `OMG.Watcher.Web` module, which inject this fn to all ctlrs). It does:
+  - Unsuccessful result is passed through (and will be handled by `fallback_controller`, it’s std Phx behavior)
+  - Sanitizes the result: converts structs to maps, encoded binary to hex, and so (see: `OMG.Watcher.Web.Serializer.Response`)
+  - Discovers `View` module from `Ctlr` and passes result with `%{response: result}` where `result` is unwrapped from `{:ok, _}` tuple
+
+```elixir
 defmodule OMG.Watcher.Web.Controller.Account do
 
     def get_balance(conn, params) do
@@ -205,7 +200,14 @@ defmodule OMG.Watcher.Web.Controller.Account do
         end
     end
 end
+```
 
+## Views layer
+- In most cases just passes the response to `OMG.RPC.Web.Serializer.Response.serialize` function which forms std API response 
+- It’s the place to restructure response if needed, e.g. add/remove some fields
+- It’s assumed that `Views` renders only successful responses
+
+```elixir
 defmodule OMG.Watcher.Web.View.Account do
 
     def render("balance.json", %{response: balance}) do
@@ -216,6 +218,7 @@ end
 ```
 
 ## Validators
+See [validator engine](https://github.com/omisego/elixir-omg/blob/master/apps/omg_rpc/lib/web/validators/base.ex)
 
 * `integer`
 * `pos_integer`
@@ -225,7 +228,7 @@ end
 * `address` - :hex + length = 20
 * `length` - for binary
 * `greater` - for integers
-* `optional` - tricky!!!, last in validator list, e.g.
+* `optional` - :boom: tricky :exclamation:, always last in validators list, e.g.
 
 ```elixir
   def get_transactions(conn, params) do

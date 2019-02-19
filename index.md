@@ -148,3 +148,38 @@ def phoenix(%Plug.Conn{} = conn) do
 end
 ```
 
+
+![](assets/phx-hell.jpg)
+# Phoenix meets Blockchain
+or API development at imapp(R)
+
+<img href="assets/unhappy-papa.jpg" style="align: left" />
+
+## General assumptions
+- API follows Http-RPC convention, here action name is contained in url but parameters always go in request body, in JSON
+- Accept only POST request with `application/json` set in `Content-type` header
+- Responds always with `HTTP 200` for all request successful or not. (`HTTP 500` means erl process crash)
+- There is always one additional `application API` layer between Phx controller and application, see: `OMG.Watcher.API` module as example.
+
+
+## Application API layer
+- Does not validates passed parameters, assume valid params or crash early
+- Response follows convention of
+  - `{:ok, result}` - when successfull
+  - `{:error, reason}` - when fails
+  - `[list]` - queries with multiple items or empty list
+
+
+## Controllers layer
+- Validates all parameters in `with` expression, use `OMG.RPC.Web.Validator.Base` module
+- Pass validated params to `application API` function with the same name as Controller action
+- Pass the result to the `api_response` function, (see: `OMG.Watcher.Web` module, which inject this fn to all ctlrs). It does:
+  - Unsuccessful result is passed through (and will be handled by `fallback_controller`, it’s std Phx behavior)
+  - Sanitizes the result: converts structs to maps, encoded binary to hex, and so (see: `OMG.Watcher.Web.Serializer.Response`)
+  - Discovers `View` module from `Ctlr` and passes result with `%{response: result}` where `result` is unwrapped from `{:ok, _}` tuple
+
+
+## Views layer
+- In most cases just passes the response to `OMG.RPC.Web.Serializer.Response.serialize` function which forms std API response 
+- It’s the place to restructure response if needed, e.g. add/remove some fields
+- It’s assumed that `Views` renders only successful responses

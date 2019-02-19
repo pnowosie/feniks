@@ -18,10 +18,11 @@ def phoenix(%Plug.Conn{} = conn) do
 end
 
 
-@doc """
+defmodule Plug.Conn do
+@moduledoc """
 Connection = {Request, Response}
 """
-defmodule Plug.Conn do
+
     defstruct [
         # request fields
         :host,
@@ -37,10 +38,11 @@ defmodule Plug.Conn do
 end
 
 
-@doc """
+defmodule MyPlug do
+@moduledoc """
 Have you heard of `Middlewares`?
 """
-defmodule MyPlug do
+
     def init([]), do: opts
     def call(conn, opts), do: conn
 end

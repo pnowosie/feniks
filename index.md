@@ -183,3 +183,54 @@ or API development at imapp(R)
 - In most cases just passes the response to `OMG.RPC.Web.Serializer.Response.serialize` function which forms std API response 
 - It’s the place to restructure response if needed, e.g. add/remove some fields
 - It’s assumed that `Views` renders only successful responses
+
+```elixir
+defmodule OMG.Watcher.API.Transaction do
+
+    @spec get(binary()) :: {:ok, %DB.Transaction{}} | {:error, :transaction_not_found}
+    def get(transaction_id) do
+        if transaction = DB.Transaction.get(transaction_id),
+            do: {:ok, transaction},
+            else: {:error, :transaction_not_found}
+    end
+end
+
+defmodule OMG.Watcher.Web.Controller.Account do
+
+    def get_balance(conn, params) do
+        with {:ok, address} <- expect(params, "address", :address) do
+            address
+            |> API.Account.get_balance()
+            |> api_response(conn, :balance)
+        end
+    end
+end
+
+defmodule OMG.Watcher.Web.View.Account do
+
+    def render("balance.json", %{response: balance}) do
+        balance
+        |> OMG.RPC.Web.Response.serialize()
+    end
+end
+```
+
+## Validators
+
+* integer
+* pos_integer
+* non_neg_integer
+* hex - 0x lowercased, hex-encoded string
+* hash - :hex + length = 32
+* address - :hex + length = 20
+* length - for binary
+* greater - for integers
+* optional - tricky!!!, last in validator list, e.g.
+
+```elixir
+  def get_transactions(conn, params) do
+    with {:ok, address} <- expect(params, "address", [:address, :optional]),
+         {:ok, limit} <- expect(params, "limit", [:pos_integer, :optional]),
+         {:ok, blknum} <- expect(params, "blknum", [:pos_integer, :optional]) do
+         
+```

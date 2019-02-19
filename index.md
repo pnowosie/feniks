@@ -238,7 +238,6 @@ See [validator engine](https://github.com/omisego/elixir-omg/blob/master/apps/om
 
 ```
 
-<script type="text/javascript">
-    // remove GH-pages injected header
-    document.querySelector(".markdown-body > :first-child").remove()
+<script type="text/javascript" style="display:none">
+    document.querySelector(".markdown-body > :first-child").remove() // remove GH-pages injected header
 </script>

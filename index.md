@@ -153,7 +153,7 @@ end
 # Phoenix meets Blockchain
 or API development at imapp(R)
 
-<img src="assets/unhappy-papa.jpg" style="float: left" />
+<img src="assets/unhappy-papa.jpg" style="float: right;" height=50% >
 
 ## General assumptions
 - API follows Http-RPC convention, here action name is contained in url but parameters always go in request body, in JSON

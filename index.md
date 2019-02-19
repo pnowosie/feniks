@@ -152,7 +152,7 @@ end
 
 ![](assets/phx-hell.jpg)
 # Phoenix meets Blockchain
-or API development at imapp(R)
+or API development at imapp&reg;
 
 <img src="assets/unhappy-papa.jpg" style="float: left; max-width: 14%; box-sizing: content-box; padding-right: 45px;" >
 

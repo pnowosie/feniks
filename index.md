@@ -217,20 +217,20 @@ end
 
 ## Validators
 
-* integer
-* pos_integer
-* non_neg_integer
-* hex - 0x lowercased, hex-encoded string
-* hash - :hex + length = 32
-* address - :hex + length = 20
-* length - for binary
-* greater - for integers
-* optional - tricky!!!, last in validator list, e.g.
+* `integer`
+* `pos_integer`
+* `non_neg_integer`
+* `hex` - 0x lowercased, hex-encoded string
+* `hash` - :hex + length = 32
+* `address` - :hex + length = 20
+* `length` - for binary
+* `greater` - for integers
+* `optional` - tricky!!!, last in validator list, e.g.
 
 ```elixir
   def get_transactions(conn, params) do
     with {:ok, address} <- expect(params, "address", [:address, :optional]),
          {:ok, limit} <- expect(params, "limit", [:pos_integer, :optional]),
          {:ok, blknum} <- expect(params, "blknum", [:pos_integer, :optional]) do
-         
+
 ```

@@ -139,8 +139,8 @@ end
 ```elixir
 def phoenix(%Plug.Conn{} = conn) do
     conn
-    |> endpoint()
-    |> router()
+    |> Endpoint.call()
+    |> Router.call()
     |> pipeline(:api)
     |> UserController.action()
     |> UserController.index()
@@ -148,6 +148,7 @@ def phoenix(%Plug.Conn{} = conn) do
 end
 ```
 
+---
 
 ![](assets/phx-hell.jpg)
 # Phoenix meets Blockchain
@@ -181,12 +182,13 @@ defmodule OMG.Watcher.API.Transaction do
 end
 ```
 
+
 ## Controllers layer
 - Validates all parameters in `with` expression, use `OMG.RPC.Web.Validator.Base` module
 - Pass validated params to `application API` function with the same name as Controller action
 - Pass the result to the `api_response` function, (see: `OMG.Watcher.Web` module, which inject this fn to all ctlrs). It does:
-  - Unsuccessful result is passed through (and will be handled by `fallback_controller`, it’s std Phx behavior)
-  - Sanitizes the result: converts structs to maps, encoded binary to hex, and so (see: `OMG.Watcher.Web.Serializer.Response`)
+  - Unsuccessful result is passed through (and will be handled by `fallback_action`, it’s std Phx behavior)
+  - Sanitizes the result: converts structs to maps, encoded binary to hex, 
   - Discovers `View` module from `Ctlr` and passes result with `%{response: result}` where `result` is unwrapped from `{:ok, _}` tuple
 
 ```elixir
@@ -202,10 +204,11 @@ defmodule OMG.Watcher.Web.Controller.Account do
 end
 ```
 
+
 ## Views layer
 - In most cases just passes the response to `OMG.RPC.Web.Serializer.Response.serialize` function which forms std API response 
 - It’s the place to restructure response if needed, e.g. add/remove some fields
-- It’s assumed that `Views` renders only successful responses
+- It’s assumed that `Views` renders **only successful responses**
 
 ```elixir
 defmodule OMG.Watcher.Web.View.Account do
@@ -216,6 +219,7 @@ defmodule OMG.Watcher.Web.View.Account do
     end
 end
 ```
+
 
 ## Validators
 See [validator engine](https://github.com/omisego/elixir-omg/blob/master/apps/omg_rpc/lib/web/validators/base.ex)
@@ -238,6 +242,23 @@ See [validator engine](https://github.com/omisego/elixir-omg/blob/master/apps/om
 
 ```
 
-<script type="text/javascript" style="display:none">
+In case parameter value fails to satisfy any of validators, tuple `{:error, {:validation_error, param_name, validator}}` is returned and is transalated to client message in `Web.Controller.Fallback`.
+
+
+## Error handling
+In case when castomized error message needs to be provided to client one needs to add unique `atom :error_key` to `@errors` map defined in `Web.Controller.Fallback`. 
+Then tuple `{:error, :error_key}` should be returned from corresponding application API's function.
+
+
+## Resources
+
+* Most recent version of [API Spec in Swagger](https://omisego.github.io/elixir-omg/), 
+* Swagger specs `json` is generated from `yaml` files located in `web/priv/swagger` directory, generation is described in [eWallet repo](https://github.com/omisego/ewallet/blob/master/docs/setup/advanced/api_specs.md), 
+* [API Errors description page](https://github.com/omisego/elixir-omg/blob/master/docs/api_specs/errors.md)
+* [API Spec proposal](https://github.com/omisego/elixir-omg/pull/277)
+
+
+---
+<script type="text/javascript">
     document.querySelector(".markdown-body > :first-child").remove() // remove GH-pages injected header
 </script>

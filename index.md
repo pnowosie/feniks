@@ -232,7 +232,7 @@ See [validator engine](https://github.com/omisego/elixir-omg/blob/master/apps/om
 * `address` - :hex + length = 20
 * `length` - for binary
 * `greater` - for integers
-* `optional` - :boom: tricky :exclamation:, always last in validators list, e.g.
+* `optional` - :boom: tricky :exclamation:, **always last in validators list**, e.g.
 
 ```elixir
   def get_transactions(conn, params) do

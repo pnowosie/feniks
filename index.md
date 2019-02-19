@@ -237,3 +237,8 @@ See [validator engine](https://github.com/omisego/elixir-omg/blob/master/apps/om
          {:ok, blknum} <- expect(params, "blknum", [:pos_integer, :optional]) do
 
 ```
+
+<script type="text/javascript">
+    // remove GH-pages injected header
+    document.querySelector(".markdown-body > :first-child").remove()
+</script>
